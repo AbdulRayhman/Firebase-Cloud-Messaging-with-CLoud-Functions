@@ -69,42 +69,44 @@ admin.initializeApp(functions.config().firebase);
 // 			});
 // 	});
 
-export const newUserAdded = functions.database.ref('/users').onWrite(snap => {
-	// Get an object representing the document
-	// e.g. {'name': 'Marie', 'age': 66}
-	const newUser = snap.after.val();
+export const newUserAdded = functions.database
+	.ref('/users/{userId}')
+	.onCreate((snap, context) => {
+		// Get an object representing the document
+		// e.g. {'name': 'Marie', 'age': 66}
+		const newUser = snap.val();
 
-	console.log(newUser);
-	// access a particular field as you would any JS property
-	const name = newUser.name;
+		console.log('===>User Object', newUser, context.params.userId);
+		// access a particular field as you would any JS property
+		const name = newUser.name;
 
-	// perform desired operations ...
-	console.log(name);
-	const payload = {
-		notification: {
-			title: 'New User Added',
-			body: `${newUser.name} with emailID ${newUser.email}`
-		}
-	};
-	return admin
-		.database()
-		.ref(`/fcmTokens/Saud’s iPhone`)
-		.once('value')
-		.then(token => {
-			console.log(token.val(), token);
-			return token.val();
-		})
-		.then(userFcmToken => {
-			console.log(userFcmToken, payload);
-			return admin.messaging().sendToDevice(userFcmToken, payload);
-		})
-		.then(res => {
-			console.log('Sent Successfully', res);
-		})
-		.catch(err => {
-			console.log(err);
-		});
-});
+		// perform desired operations ...
+		console.log(name);
+		const payload = {
+			notification: {
+				title: 'Pukaar',
+				body: `New user sign-up! Please check your app.`
+			}
+		};
+		return admin
+			.database()
+			.ref(`/fcmTokens/Saud’s iPhone`)
+			.once('value')
+			.then(token => {
+				console.log(token.val(), token);
+				return token.val();
+			})
+			.then(userFcmToken => {
+				console.log(userFcmToken, payload);
+				return admin.messaging().sendToDevice(userFcmToken, payload);
+			})
+			.then(res => {
+				console.log('Sent Successfully', res);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+	});
 // export const onPatientAdded = functions.firestore
 // 	.document('/patients/')
 // 	.onCreate((change, context) => {
