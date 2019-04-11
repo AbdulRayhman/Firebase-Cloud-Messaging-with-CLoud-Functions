@@ -88,13 +88,23 @@ export const newUserAdded = functions.database
 				body: `New user sign-up! Please check your app.`
 			}
 		};
+		// const fs =
 		return admin
 			.database()
-			.ref(`/fcmTokens/Saud’s iPhone`)
+			.ref(`/fcmTokens`)
 			.once('value')
 			.then(token => {
 				console.log(token.val(), token);
-				return token.val();
+
+				const arr = [];
+				// const fcmTokenObj = snapshot.val();
+				// console.log(Object.keys(fcmTokenObj));
+				token.forEach(element => {
+					console.log(element['node_']['value_']);
+					arr.push(element['node_']['value_']);
+				});
+				console.log(arr);
+				return arr;
 			})
 			.then(userFcmToken => {
 				console.log(userFcmToken, payload);
